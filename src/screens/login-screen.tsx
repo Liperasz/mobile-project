@@ -8,9 +8,11 @@ import { useTheme } from '../context/theme-context';
 interface LoginScreenProps{
     // o que é executado depois do login
     onLogin: () => void;
+    // função para ir para a tela de cadastro
+    onNavigateToRegister: () => void;
 }
 
-export default function LoginScreen( { onLogin }: LoginScreenProps) {
+export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScreenProps) {
 
     // cores dos temas
     const { colors } = useTheme();
@@ -37,7 +39,7 @@ export default function LoginScreen( { onLogin }: LoginScreenProps) {
                     source={require('../../assets/images/logo.png')}
                     style={styles.logo}
                     resizeMode="contain"
-                    />
+                />
                 {/* título */}
                 <Text style={[styles.title, {color: colors.primaryDark}]}>
                     WasteGo
@@ -72,7 +74,7 @@ export default function LoginScreen( { onLogin }: LoginScreenProps) {
                 <Button label="Entrar" onPress={handleLogin}></Button>
                 <Button
                     label="Criar conta"
-                    onPress={() => {}}
+                    onPress={(onNavigateToRegister)}
                     variant='ghost'
                     style={{marginTop: 10}}
                 >

@@ -4,13 +4,13 @@ import Button from '../components/button';
 import Input from '../components/input';
 import { useTheme } from '../context/theme-context';
 
-
-interface LoginScreenProps{
+// propriedades
+type LoginScreenProps = {
     // o que é executado depois do login
     onLogin: () => void;
     // função para ir para a tela de cadastro
     onNavigateToRegister: () => void;
-}
+};
 
 export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScreenProps) {
 
@@ -85,6 +85,7 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
     );
 }
 
+// estilização
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 28 },
     header:    { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },

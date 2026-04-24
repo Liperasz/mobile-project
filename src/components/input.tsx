@@ -2,7 +2,8 @@ import React from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { useTheme } from '../context/theme-context';
 
-interface InputProps {
+// propriedades do input
+type InputProps = {
     label: string;
     value: string;
     // função que aviza se o texto foi alterado
@@ -14,7 +15,7 @@ interface InputProps {
     secureTextEntry?: boolean;
     // qual teclado vai ser aberto
     keyboardType?: 'default' | 'email-address' | 'numeric';
-}
+};
 
 export default function Input ({
     label,
@@ -53,6 +54,7 @@ export default function Input ({
     );
 }
 
+// estilização
 const styles = StyleSheet.create({
     wrapper: { 
         marginBottom: 14 

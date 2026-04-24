@@ -6,13 +6,13 @@ import { useTheme } from '../context/theme-context';
 type ButtonVariant = 'primary' | 'ghost' | 'danger';
 
 // propriedades do botão
-interface ButtonProps {
+type ButtonProps = {
     label: string;
     onPress: () => void;
     variant?: ButtonVariant;
     disabled?: boolean;
     style?: ViewStyle;
-}
+};
 
 // componente
 export default function Button ({
@@ -74,7 +74,6 @@ export default function Button ({
 }
 
 const styles = StyleSheet.create({
-
     base: {
         paddingVertical: 16,
         paddingHorizontal: 20,

@@ -4,10 +4,10 @@ import Button from '../components/button';
 import Input from '../components/input';
 import { useTheme } from '../context/theme-context';
 
-// depois de criar a conta, volta a tela de login
-interface RegisterScreenProps {
+// propriedades da tela de registro
+type RegisterScreenProps = {
     onBackToLogin: () => void;
-}
+};
 
 export default function RegisterScreen({ onBackToLogin }: RegisterScreenProps) {
 

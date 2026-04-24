@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Alert, Image, Text, View } from 'react-native';
-import Button from '../components/Button';
-import Input from '../components/Input';
+import { Alert, Image, StyleSheet, Text, View } from 'react-native';
+import Button from '../components/button';
+import Input from '../components/input';
+import { useTheme } from '../context/theme-context';
 
 
 interface LoginScreenProps{
@@ -11,6 +12,8 @@ interface LoginScreenProps{
 
 export default function LoginScreen( { onLogin }: LoginScreenProps) {
 
+    // cores dos temas
+    const { colors } = useTheme();
     // variaveis de email e senha
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
@@ -25,27 +28,28 @@ export default function LoginScreen( { onLogin }: LoginScreenProps) {
     };
 
     return (
-        <View>
+        <View style={[styles.container, {backgroundColor: colors.background}]}>
 
             {/* header da página*/}
-            <View>
+            <View style={styles.header}>
                 {/* imagem da logo do projeto */}
                 <Image
                     source={require('../../assets/images/logo.png')}
+                    style={styles.logo}
                     resizeMode="contain"
                     />
                 {/* título */}
-                <Text>
+                <Text style={[styles.title, {color: colors.primaryDark}]}>
                     WasteGo
                 </Text>
                 {/* subtítulo */}
-                <Text>
+                <Text style={[styles.subtitle, {color: colors.textMuted}]}>
                     Conectando cidadãos, empresas, governo e cooperativas.
                 </Text>
             </View>
 
             {/* conteúdo da página */}
-            <View>
+            <View style={styles.form}>
                 {/* campos de email e senha */}
                 <Input
                     label="E-mail"
@@ -64,11 +68,27 @@ export default function LoginScreen( { onLogin }: LoginScreenProps) {
             </View>
 
             {/* rodapé / footer */}
-            <View>
+            <View style={styles.cta}>
                 <Button label="Entrar" onPress={handleLogin}></Button>
-                <Button label="Criar conta" onPress={() => {}}></Button>
+                <Button
+                    label="Criar conta"
+                    onPress={() => {}}
+                    variant='ghost'
+                    style={{marginTop: 10}}
+                >
+                </Button>
             </View>
 
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: { flex: 1, padding: 28 },
+    header:    { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+    logo:      { width: 80, height: 80 },
+    title:     { fontSize: 32, fontWeight: '700', letterSpacing: -1 },
+    subtitle:  { fontSize: 14, textAlign: 'center' },
+    form:      { flex: 1, justifyContent: 'center' },
+    cta:       { paddingBottom: 16 },
+});

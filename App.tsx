@@ -1,15 +1,21 @@
 import { useState } from "react";
+import { ThemeProvider } from "./src/context/theme-context";
 import LoginScreen from "./src/screens/login-screen";
 
+// inicia o app
 export default function App() {
 
-    // define se usuário já está logado
+    // constante para ver se está logado
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    // se não está logado, vai pra tela de login
-    if (!isLoggedIn) {
-        return <LoginScreen onLogin={() => setIsLoggedIn(true)}></LoginScreen>;
-    }
-
-    return <LoginScreen onLogin={() => setIsLoggedIn(true)}></LoginScreen>;
+    return (
+        <ThemeProvider>
+            {!isLoggedIn ? (
+                <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+            ) : (
+                /* Aqui você colocaria sua tela de Home/Principal futuramente */
+                <LoginScreen onLogin={() => setIsLoggedIn(true)} />
+            )}
+        </ThemeProvider>
+    );
 }

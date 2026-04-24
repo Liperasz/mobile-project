@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { useTheme } from '../context/theme-context';
 
 interface InputProps {
     label: string;
@@ -24,9 +25,12 @@ export default function Input ({
     keyboardType = 'default',
 }: InputProps) {
 
+    // cores do tema
+    const { colors } = useTheme();
+
     return (
-        <View>
-            <Text>
+        <View style={styles.wrapper}>
+            <Text style={[styles.label, { color: colors.textMuted }]}>
                 {label.toUpperCase()}
             </Text>
             <TextInput
@@ -35,7 +39,34 @@ export default function Input ({
                 placeholder={placeholder}
                 secureTextEntry={secureTextEntry}
                 keyboardType={keyboardType}
+                placeholderTextColor={colors.textMuted}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    color: colors.text
+                  }  
+                ]}
             />
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    wrapper: { 
+        marginBottom: 14 
+    },
+    label: { 
+        fontSize: 11, 
+        fontWeight: '600', 
+        letterSpacing: 0.8, 
+        marginBottom: 6 
+    },
+    input: { 
+        borderWidth: 1.5, 
+        borderRadius: 12, 
+        padding: 14, 
+        fontSize: 15 
+    },
+});

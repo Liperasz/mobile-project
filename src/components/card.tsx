@@ -8,7 +8,7 @@ type CardProps = {
     style?: ViewStyle;
 };
 
-// componente apresentacional puro
+// componente
 export default function Card({ children, style }: CardProps) {
     
     // cores do tema

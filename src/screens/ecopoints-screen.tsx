@@ -78,14 +78,13 @@ export default function EcopointsScreen() {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-
             {/* header da tela */}
             <View style={[styles.header, { borderBottomColor: colors.border }]}>
                 <Text style={[styles.headerTitle, { color: colors.primaryDark }]}>
                     Ecopontos próximos
                 </Text>
             </View>
-            // Flatlist contendo os ecopontos
+            {/* Flatlist contendo os ecopontos */}
             <FlatList
                 data={ECOPOINTS}
                 keyExtractor={item => item.id}

@@ -42,3 +42,5 @@ app-example
 
 # ide
 .vscode/
+
+package-lock.json

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/theme-context';
+
 import AnnounceScreen from './src/screens/announce-screen';
 import EcopointsScreen from './src/screens/ecopoints-screen';
 import HomeScreen from './src/screens/home-screen';
@@ -104,9 +106,12 @@ function AppContent() {
 // Componente App está separado para conseguir mandar o tema para o resto
 export default function App() {
     return (
-        <ThemeProvider>
-            <AppContent />
-        </ThemeProvider>
+        <SafeAreaProvider>
+            <ThemeProvider>
+                <AppContent />
+            </ThemeProvider>
+        </SafeAreaProvider>
+
     );
 }
 

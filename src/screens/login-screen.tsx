@@ -81,6 +81,7 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
                 <Input
                     label="E-mail"
                     value={email}
+                    errorMessage={emailError}
                     onChangeText={(text) => {
                         setEmail(text);
                         // limpa a mensagem de erro ao digitar
@@ -92,6 +93,7 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
                 <Input
                     label="Senha"
                     value={password}
+                    errorMessage={passwordError}
                     onChangeText={(text) => {
                         setPassword(text);
                         // limpa a mensagem de erro ao digitar

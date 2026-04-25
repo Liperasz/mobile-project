@@ -27,16 +27,16 @@ export default function HomeScreen() {
     const { colors, scheme, toggleTheme } = useTheme();
     const isDark = scheme === 'dark';
 
-    // item da flatlist — está isolado para maior performance
+    // item da flatlist, isolado para maior performance
     const renderHistoryItem = ({ item }: ListRenderItemInfo<HistoryItem>) => (
         <Card>
             <View style={styles.histRow}>
                 <Text style={styles.histIcon}>{item.icon}</Text>
-                <View style={{ flex: 1 }}>
+                <View style={styles.histTextContainer}>
                     <Text style={[styles.histTitle, { color: colors.text }]}>
                         {item.cat} · {item.kg}kg
                     </Text>
-                    <Text style={{ fontSize: 12, color: colors.textMuted }}>
+                    <Text style={[styles.histDate, { color: colors.textMuted }]}>
                         {item.date}
                     </Text>
                 </View>
@@ -58,9 +58,9 @@ export default function HomeScreen() {
                 {/* botão para alternar tema */}
                 <Pressable
                     onPress={toggleTheme}
-                    style={({ pressed }) => [styles.themeBtn, { opacity: pressed ? 0.7 : 1 }]}
+                    style={({ pressed }) => [styles.themeBtn, pressed && styles.themeBtnPressed]}
                 >
-                    <Text style={{ color: colors.primary, fontSize: 13 }}>
+                    <Text style={[styles.themeBtnText, { color: colors.primary }]}>
                         {isDark ? '🌙 Dark' : '☀ Light'}
                     </Text>
                 </Pressable>
@@ -139,6 +139,12 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1
     },
+    themeBtnPressed: {
+        opacity: 0.7
+    },
+    themeBtnText: {
+        fontSize: 13
+    },
     list: {
         padding: 16
     },
@@ -189,12 +195,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12
     },
-    histIcon: {
-        fontSize: 22
+    histIcon: { 
+        fontSize: 22 
+    },
+    histTextContainer: {
+        flex: 1
     },
     histTitle: {
         fontSize: 14,
         fontWeight: '500'
+    },
+    histDate: {
+        fontSize: 12
     },
     histPts: {
         fontSize: 14,

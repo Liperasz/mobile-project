@@ -33,6 +33,9 @@ export default function AnnounceScreen() {
         photoTaken:  false,
     });
 
+    // stado para controlar a abertura da lista de categorias
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
     // erros de validação
     const [categoryError, setCategoryError] = useState('');
     const [weightError, setWeightError] = useState('');
@@ -88,49 +91,51 @@ export default function AnnounceScreen() {
             {/* conteúdo com scroll */}
             <ScrollView contentContainerStyle={styles.content}>
 
-                {/* alerta de sucesso — exibido após envio */}
-                {showSuccessAlert && (
-                    <AlertBox
-                        title="Sucesso!"
-                        message={`Anúncio de ${form.category} (${form.weightKg}kg) criado com sucesso!`}
-                        variant="success"
-                        onClose={handleAlertClose}
-                    />
-                )}
-
                 {/* seleção de categoria */}
                 <Text style={[styles.label, { color: colors.textMuted }]}>
                     CATEGORIA DO RESÍDUO
                 </Text>
-                <View style={styles.categoryGrid}>
-                    {CATEGORIES.map(cat => (
-                        <Pressable
-                            key={cat}
-                            onPress={() => {
-                                update('category', cat);
-                                setCategoryError('');
-                            }}
-                            style={({ pressed }) => [
-                                styles.catBtn,
-                                {
-                                    backgroundColor: form.category === cat
-                                        ? colors.primary
-                                        : colors.surface,
-                                    borderColor: form.category === cat
-                                        ? colors.primary
-                                        : colors.border,
-                                    opacity: pressed ? 0.75 : 1,
-                                    transform: [{ scale: pressed ? 0.96 : 1 }],
-                                },
-                            ]}
-                        >
-                            <Text style={[styles.catBtnText, { color: form.category === cat ? '#fff' : colors.text }]}>
-                                {cat}
-                            </Text>
-                        </Pressable>
-                    ))}
+                
+                {/* componente de seleção de um item (famosa caixinha de seleção) */}
+                <View style={styles.dropdownWrapper}>
+                    <Pressable
+                        onPress={() => setIsDropdownOpen(!isDropdownOpen)}
+                        style={[
+                            styles.dropdownHeader,
+                            { 
+                                backgroundColor: colors.surface, 
+                                borderColor: categoryError ? '#ef4444' : colors.border 
+                            }
+                        ]}
+                    >
+                        <Text style={{ color: form.category ? colors.text : colors.textMuted }}>
+                            {form.category || '(nenhuma categoria selecionada)'}
+                        </Text>
+                        <Text style={{ color: colors.primary }}>{isDropdownOpen ? '▲' : '▼'}</Text>
+                    </Pressable>
+
+                    {isDropdownOpen && (
+                        <View style={[styles.dropdownList, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                            {CATEGORIES.map(cat => (
+                                <Pressable
+                                    key={cat}
+                                    onPress={() => {
+                                        update('category', cat);
+                                        setCategoryError('');
+                                        setIsDropdownOpen(false);
+                                    }}
+                                    style={({ pressed }) => [
+                                        styles.dropdownItem,
+                                        { backgroundColor: pressed ? colors.primaryLight : 'transparent' }
+                                    ]}
+                                >
+                                    <Text style={{ color: colors.text }}>{cat}</Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    )}
                 </View>
-                {/* erro de categoria */}
+                {/*  Erro caso nenhuma categoria esteja selecionada */}
                 {categoryError ? (
                     <Text style={styles.errorText}>{categoryError}</Text>
                 ) : null}
@@ -189,7 +194,6 @@ export default function AnnounceScreen() {
                 </Text>
                 {form.photoTaken ? (
                     <View style={[styles.photoPreview, { backgroundColor: colors.primaryLight }]}>
-                        {/* Refatorado: fontWeight movido para o StyleSheet */}
                         <Text style={[styles.photoPreviewText, { color: colors.primary }]}>
                             📸 Foto capturada (simulada)
                         </Text>
@@ -206,7 +210,6 @@ export default function AnnounceScreen() {
                             },
                         ]}
                     >
-                        {/* Refatorado: fontSize movido para o StyleSheet */}
                         <Text style={styles.photoIcon}>📷</Text>
                         <Text style={[styles.photoLabel, { color: colors.primary }]}>
                             Simular Captura de Foto
@@ -218,101 +221,133 @@ export default function AnnounceScreen() {
                 <Button
                     label="Anunciar Resíduo"
                     onPress={handleSubmit}
-                    /* Refatorado: estilo estático passado para o StyleSheet */
                     style={styles.submitBtn}
                 />
 
             </ScrollView>
+
+            {/* alerta de sucesso de envio*/}
+            {showSuccessAlert && (
+                <View style={[styles.overlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                    <View style={styles.alertWrapper}>
+                        <AlertBox
+                            title="Sucesso!"
+                            message={`Anúncio de ${form.category} (${form.weightKg}kg) criado com sucesso!`}
+                            variant="success"
+                            onClose={handleAlertClose}
+                        />
+                    </View>
+                </View>
+            )}
+
         </View>
     );
 }
 
 // estilização
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  content: {
-    padding: 20,
-    gap: 10,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.8,
-    marginBottom: 6,
-    marginTop: 8,
-  },
-  categoryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 4,
-  },
-  catBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1.5,
-  },
-  catBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  input: {
-    borderWidth: 1.5,
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 15,
-    marginBottom: 4,
-  },
-  textarea: {
-    borderWidth: 1.5,
-    borderRadius: 12,
-    padding: 14,
-    fontSize: 14,
-    textAlignVertical: 'top',
-    height: 90,
-  },
-  photoPressable: {
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    borderRadius: 12,
-    padding: 24,
-    alignItems: 'center',
-    gap: 8,
-  },
-  photoPreview: {
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
-  },
-  photoPreviewText: {
-    fontWeight: '600',
-  },
-  photoIcon: {
-    fontSize: 28,
-  },
-  photoLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  errorText: {
-    color: '#ef4444',
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 4,
-    marginLeft: 4,
-  },
-  submitBtn: {
-    marginTop: 24,
-  },
+    container: {
+        flex: 1,
+    },
+    header: {
+        padding: 20,
+        borderBottomWidth: 1,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+    },
+    content: {
+        padding: 20,
+        gap: 10,
+    },
+    label: {
+        fontSize: 11,
+        fontWeight: '600',
+        letterSpacing: 0.8,
+        marginBottom: 6,
+        marginTop: 8,
+    },
+    dropdownWrapper: {
+        zIndex: 10, 
+        marginBottom: 4,
+    },
+    dropdownHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderRadius: 12,
+        padding: 14,
+    },
+    dropdownList: {
+        marginTop: 4,
+        borderWidth: 1.5,
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    dropdownItem: {
+        padding: 14,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: '#eee',
+    },
+    input: {
+        borderWidth: 1.5,
+        borderRadius: 12,
+        padding: 14,
+        fontSize: 15,
+        marginBottom: 4,
+    },
+    textarea: {
+        borderWidth: 1.5,
+        borderRadius: 12,
+        padding: 14,
+        fontSize: 14,
+        textAlignVertical: 'top',
+        height: 90,
+    },
+    photoPressable: {
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        borderRadius: 12,
+        padding: 24,
+        alignItems: 'center',
+        gap: 8,
+    },
+    photoPreview: {
+        borderRadius: 12,
+        padding: 20,
+        alignItems: 'center',
+    },
+    photoPreviewText: {
+        fontWeight: '600',
+    },
+    photoIcon: {
+        fontSize: 28,
+    },
+    photoLabel: {
+        fontSize: 15,
+        fontWeight: '600',
+    },
+    errorText: {
+        color: '#ef4444',
+        fontSize: 12,
+        fontWeight: '600',
+        marginTop: 4,
+        marginLeft: 4,
+    },
+    submitBtn: {
+        marginTop: 24,
+    },
+    // overlay é para sobrepor o resto dos quando o alerta for acionado
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999,
+        padding: 20,
+    },
+    alertWrapper: {
+        width: '100%',
+    }
 });

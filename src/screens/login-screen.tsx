@@ -122,11 +122,34 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
 
 // estilização
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 28 },
-    header:    { flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-    logo:      { width: 80, height: 80 },
-    title:     { fontSize: 32, fontWeight: '700', letterSpacing: -1 },
-    subtitle:  { fontSize: 14, textAlign: 'center' },
-    form:      { flex: 1, justifyContent: 'center' },
-    cta:       { paddingBottom: 16 },
+    container: {
+        flex: 1,
+        padding: 28
+    },
+    header: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 8
+    },
+    logo: {
+        width: 80,
+        height: 80
+    },
+    title: {
+        fontSize: 32,
+        fontWeight: '700', 
+        letterSpacing: -1 
+    },
+    subtitle: {
+        fontSize: 14,
+        textAlign: 'center'
+    },
+    form: {
+        flex: 1,
+        justifyContent: 'center'
+    },
+    cta: {
+        paddingBottom: 16
+    },
 });

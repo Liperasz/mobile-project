@@ -166,12 +166,35 @@ export default function RegisterScreen({ onBackToLogin }: RegisterScreenProps) {
 }
 
 const styles = StyleSheet.create({
-    logo: { width: 80, height: 80, marginBottom: 8 },
-    container: { flex: 1 },
-    content: { padding: 28, paddingBottom: 50 },
-    header: { marginBottom: 32, alignItems: 'center' },
-    title: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, marginBottom: 4 },
-    subtitle: { fontSize: 14 },
-    form: { marginBottom: 24 },
-    cta: { marginTop: 8 },
+    logo: {
+        width: 80,
+        height: 80,
+        marginBottom: 8
+    },
+    container: {
+        flex: 1
+    },
+    content: {
+        padding: 28,
+        paddingBottom: 50
+    },
+    header: {
+        marginBottom: 32,
+        alignItems: 'center'
+    },
+    title: { 
+        fontSize: 28, 
+        fontWeight: '700',
+        letterSpacing: -0.5,
+        marginBottom: 4
+    },
+    subtitle: {
+        fontSize: 14
+    },
+    form: {
+        marginBottom: 24
+    },
+    cta: {
+        marginTop: 8
+    },
 });

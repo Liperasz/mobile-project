@@ -119,7 +119,9 @@ export default function HomeScreen() {
 
 // estilização
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1
+    },
     header: { 
         flexDirection: 'row', 
         justifyContent: 'space-between',
@@ -137,7 +139,9 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1
     },
-    list: { padding: 16 },
+    list: {
+        padding: 16
+    },
     coinsCard: {
         borderRadius: 16,
         padding: 20,
@@ -185,7 +189,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12
     },
-    histIcon: { fontSize: 22 },
+    histIcon: {
+        fontSize: 22
+    },
     histTitle: {
         fontSize: 14,
         fontWeight: '500'

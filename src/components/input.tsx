@@ -15,6 +15,9 @@ type InputProps = {
     secureTextEntry?: boolean;
     // qual teclado vai ser aberto
     keyboardType?: 'default' | 'email-address' | 'numeric';
+    // mensagem de erro que seria exibida
+    errorMessage?: string;
+
 };
 
 export default function Input ({
@@ -24,6 +27,7 @@ export default function Input ({
     placeholder,
     secureTextEntry = false,
     keyboardType = 'default',
+    errorMessage,
 }: InputProps) {
 
     // cores do tema
@@ -45,11 +49,16 @@ export default function Input ({
                   styles.input,
                   {
                     backgroundColor: colors.surface,
-                    borderColor: colors.border,
+                    // Adicionando borda vermelha caso haja erro
+                    borderColor: errorMessage ? '#ef4444' : colors.border,
                     color: colors.text
                   }  
                 ]}
             />
+            {/* mensagem de erro */}
+            {errorMessage ? (
+                <Text style={styles.errorText}>{errorMessage}</Text>
+            ) : null}
         </View>
     );
 }
@@ -71,4 +80,11 @@ const styles = StyleSheet.create({
         padding: 14, 
         fontSize: 15 
     },
+    errorText: {
+        color: '#ef4444',
+        fontSize: 12,
+        fontWeight: '600',
+        marginTop: 4,
+        marginLeft: 4,
+    }
 });

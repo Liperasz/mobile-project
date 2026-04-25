@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import AlertBox from '../components/alert-box';
 import Button from '../components/button';
 import Input from '../components/input';
 import { useTheme } from '../context/theme-context';
@@ -21,30 +22,53 @@ export default function RegisterScreen({ onBackToLogin }: RegisterScreenProps) {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    // verifica se as senhas são diferentes
-    const passwordsMatch = password === confirmPassword;
-    // constante para mostrar erro caso as senhas estejam diferentes
-    const showPasswordError = confirmPassword.length > 0 && !passwordsMatch;
+    // campos de erros
+    const [fullNameError, setFullNameError] = useState('');
+    const [cpfError, setCpfError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
-    // função para lidar com o registro
+    // constannte para mostrar o alerta de sucesso
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
+    // lida com o cadastro
     const handleRegister = () => {
 
-        // se tiver algum campo vazio, pede para preencher os campos
-        if (!fullName || !cpf || !email || !password || !confirmPassword) {
-            Alert.alert('Erro', 'Por favor, preencha todos os campos.');
-            return;
-        }
+        // verificação se os campos são válidos (nesse caso apenas preenchimento)
+        let isValid = true;
 
-        // se as senhas não forem iguais
-        if (!passwordsMatch) {
-            Alert.alert('Erro', 'As senhas não coincidem.');
-            return;
-        }
+        if (!fullName.trim()) {
+            setFullNameError('O nome é obrigatório.');
+            isValid = false;
+        } else { setFullNameError(''); }
 
-        // tudo certo, conta criada
-        Alert.alert('Sucesso', 'Conta criada com sucesso!', [
-            { text: 'OK', onPress: onBackToLogin }
-        ]);
+        if (!cpf.trim()) {
+            setCpfError('O CPF é obrigatório.');
+            isValid = false;
+        } else { setCpfError(''); }
+
+        if (!email.trim()) {
+            setEmailError('O e-mail é obrigatório.');
+            isValid = false;
+        } else { setEmailError(''); }
+
+        if (!password) {
+            setPasswordError('A senha é obrigatória.');
+            isValid = false;
+        } else { setPasswordError(''); }
+
+        if (!confirmPassword) {
+            setConfirmPasswordError('Confirme sua senha.');
+            isValid = false;
+        } else if (password !== confirmPassword) {
+            setConfirmPasswordError('As senhas não coincidem.');
+            isValid = false;
+        } else { setConfirmPasswordError(''); }
+
+        if (isValid) {
+            setShowSuccessAlert(true)
+        }
     };
 
     return (
@@ -69,78 +93,85 @@ export default function RegisterScreen({ onBackToLogin }: RegisterScreenProps) {
                 </Text>
             </View>
 
-            {/* conteúdo da tela */}
-            <View style={styles.form}>
-                <Input
-                    label="Nome Completo"
-                    value={fullName}
-                    onChangeText={setFullName}
-                    placeholder="Digite seu nome"
-                />
-                <Input
-                    label="CPF"
-                    value={cpf}
-                    onChangeText={setCpf}
-                    keyboardType="numeric"
-                    placeholder="000.000.000-00"
-                />
-                <Input
-                    label="E-mail"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    placeholder="exemplo@email.com"
+            {/* Se deu sucesso, aparece o alerta e não o formulário + botões */}
+            {showSuccessAlert ? (
+                
+                <AlertBox 
+                    title="Sucesso"
+                    message="Conta criada com sucesso!"
+                    variant="success"
+                    onClose={onBackToLogin} 
                 />
                 
-                {/* mensagem de erro de senhas diferentes */}
-                {showPasswordError && (
-                    <Text style={styles.errorText}>As senhas estão diferentes</Text>
-                )}
-                
-                <Input
-                    label="Senha"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    placeholder="********"
-                />
-                <Input
-                    label="Confirmar Senha"
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    secureTextEntry
-                    placeholder="********"
-                />
-            </View>
+            ) : (
+                <>
+                    {/* conteúdo da tela (oculto se o alerta de sucesso aparecer) */}
+                    <View style={styles.form}>
+                        <Input
+                            label="Nome Completo"
+                            value={fullName}
+                            onChangeText={(text) => { setFullName(text); setFullNameError(''); }}
+                            placeholder="Digite seu nome"
+                            errorMessage={fullNameError}
+                        />
+                        <Input
+                            label="CPF"
+                            value={cpf}
+                            onChangeText={(text) => { setCpf(text); setCpfError(''); }}
+                            keyboardType="numeric"
+                            placeholder="000.000.000-00"
+                            errorMessage={cpfError}
+                        />
+                        <Input
+                            label="E-mail"
+                            value={email}
+                            onChangeText={(text) => { setEmail(text); setEmailError(''); }}
+                            keyboardType="email-address"
+                            placeholder="exemplo@email.com"
+                            errorMessage={emailError}
+                        />
+                        <Input
+                            label="Senha"
+                            value={password}
+                            onChangeText={(text) => { setPassword(text); setPasswordError(''); }}
+                            secureTextEntry
+                            placeholder="********"
+                            errorMessage={passwordError}
+                        />
+                        <Input
+                            label="Confirmar Senha"
+                            value={confirmPassword}
+                            onChangeText={(text) => { setConfirmPassword(text); setConfirmPasswordError(''); }}
+                            secureTextEntry
+                            placeholder="********"
+                            errorMessage={confirmPasswordError}
+                        />
+                    </View>
 
-            {/* rodapé /footer da tela*/}
-            <View style={styles.cta}>
-                <Button label="Cadastrar" onPress={handleRegister} />
-                <Button
-                    label="Já tenho uma conta"
-                    onPress={onBackToLogin}
-                    variant="ghost"
-                    style={{ marginTop: 10 }}
-                />
-            </View>
+                    {/* rodapé /footer da tela (oculto se o alerta de sucesso aparecer) */}
+                    <View style={styles.cta}>
+                        <Button label="Cadastrar" onPress={handleRegister} />
+                        <Button
+                            label="Já tenho uma conta"
+                            onPress={onBackToLogin}
+                            variant="ghost"
+                            style={{ marginTop: 10 }}
+                        />
+                    </View>
+                </>
+            )}
+            
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    logo: { width: 80, height: 80 },
+    logo: { width: 80, height: 80, marginBottom: 8 },
     container: { flex: 1 },
     content: { padding: 28, paddingBottom: 50 },
     header: { marginBottom: 32, alignItems: 'center' },
-    title: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
-    subtitle: { fontSize: 14, marginTop: 4 },
+    title: { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, marginBottom: 4 },
+    subtitle: { fontSize: 14 },
     form: { marginBottom: 24 },
     cta: { marginTop: 8 },
-    errorText: {
-        color: '#ef4444',
-        fontSize: 12,
-        fontWeight: '600',
-        marginBottom: 4,
-        textAlign: 'right'
-    }
 });

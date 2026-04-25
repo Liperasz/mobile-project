@@ -39,7 +39,6 @@ export default function Button ({
                         ? colors.primaryDark
                         : colors.primary,
                     opacity: disabled ? 0.5 : 1,
-                transform: [{ scale: pressed ? 0.98 : 1 }],
                 },
                 // botão ghost, invisivel
                 variant === 'ghost' && {

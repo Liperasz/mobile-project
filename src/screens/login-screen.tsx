@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import Button from '../components/button';
 import Input from '../components/input';
 import { useTheme } from '../context/theme-context';
@@ -20,13 +20,38 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
     const[email, setEmail] = useState('');
     const[password, setPassword] = useState('');
 
+    // estados de erros de email e senha
+    const[emailError, setEmailError] = useState('');
+    const[passwordError, setPasswordError] = useState('');
+
     // função que lida com o login (verificando se os campos estão vazios)
     const handleLogin = () => {
-        if (!email || !password) {
-            Alert.alert('Preencha e-mail e senha!!!');
-            return;
+        
+        // variável para verificar se os campos são validos
+        let isValid = true;
+
+
+        // verificando email e senha
+        if (!email.trim()) {
+            setEmailError('Insira seu e-mail');
+            isValid = false;
+        } else {
+            setEmailError('');
         }
-        onLogin();
+
+        if (!password) {
+            setPasswordError('Insira sua senha');
+            isValid = false;
+        } else {
+            setPasswordError('');
+        }
+
+
+        // Se os campos estão preenchidos, faz o login
+        if (isValid) {
+            onLogin();
+        }
+
     };
 
     return (
@@ -56,14 +81,22 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
                 <Input
                     label="E-mail"
                     value={email}
-                    onChangeText={setEmail}
+                    onChangeText={(text) => {
+                        setEmail(text);
+                        // limpa a mensagem de erro ao digitar
+                        setEmailError('');
+                    }}
                     keyboardType="email-address"
                     placeholder="exemplo@email.com"
                 />
                 <Input
                     label="Senha"
                     value={password}
-                    onChangeText={setPassword}
+                    onChangeText={(text) => {
+                        setPassword(text);
+                        // limpa a mensagem de erro ao digitar
+                        setPasswordError('');
+                    }}
                     secureTextEntry
                     placeholder="********"
                 />
@@ -88,7 +121,7 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
 // estilização
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 28 },
-    header:    { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
+    header:    { flex: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
     logo:      { width: 80, height: 80 },
     title:     { fontSize: 32, fontWeight: '700', letterSpacing: -1 },
     subtitle:  { fontSize: 14, textAlign: 'center' },

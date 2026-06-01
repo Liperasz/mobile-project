@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './src/context/theme-context';
 
@@ -17,6 +18,23 @@ function AppContent() {
 
     // constante com a tela atual exibida (inicia com a tela de login)
     const [currentScreen, setCurrentScreen] = useState<Screen>('login');
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const userToken = await AsyncStorage.getItem('@user_logged');
+                if (userToken) {
+                    setCurrentScreen('home');
+                }
+            } catch (e) {
+                console.error("Erro ao ler AsyncStorage", e);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        checkLoginStatus();
+    }, []);
     
     // Pegando as cores do tema para a barra de navegação e o fundo global
     const { colors } = useTheme();
@@ -31,6 +49,14 @@ function AppContent() {
         { id: 'announce', label: 'Anunciar', icon: '📢' },
         { id: 'profile', label: 'Perfil', icon: '👤' },
     ] as const;
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color={colors.primary} />
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
@@ -62,9 +88,18 @@ function AppContent() {
                 {/* ainda não fiz a tela do perfil do usuário */}
                 {currentScreen === 'profile' && (
                     <View style={styles.placeholderContainer}>
-                        <Text style={[styles.placeholderText, { color: colors.textMuted }]}>
+                        <Text style={[styles.placeholderText, { color: colors.textMuted, marginBottom: 20 }]}>
                             Tela de Perfil em construção...
                         </Text>
+                        <Pressable 
+                            style={styles.logoutBtn}
+                            onPress={async () => {
+                                await AsyncStorage.removeItem('@user_logged');
+                                setCurrentScreen('login');
+                            }}
+                        >
+                            <Text style={styles.logoutBtnText}>Sair da Conta</Text>
+                        </Pressable>
                     </View>
                 )}
             </View>
@@ -159,5 +194,18 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         textAlign: 'center',
+    },
+    logoutBtn: {
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        borderRadius: 8,
+        borderWidth: 1.5,
+        borderColor: '#ef4444',
+        backgroundColor: 'transparent',
+    },
+    logoutBtnText: {
+        color: '#ef4444',
+        fontWeight: '700',
+        fontSize: 15,
     }
 });

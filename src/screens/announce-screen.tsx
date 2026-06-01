@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import AlertBox from '../components/alert-box';
 import Button from '../components/button';
 import { useTheme } from '../context/theme-context';
@@ -12,7 +13,7 @@ type FormState = {
     category:    WasteCategory;
     weightKg:    string;
     description: string;
-    photoTaken:  boolean;
+    photoUri:  string | null;
 };
 
 // categorias disponíveis para seleção
@@ -30,7 +31,7 @@ export default function AnnounceScreen() {
         category:    '',
         weightKg:    '',
         description: '',
-        photoTaken:  false,
+        photoUri:  null,
     });
 
     // stado para controlar a abertura da lista de categorias
@@ -75,7 +76,58 @@ export default function AnnounceScreen() {
     // reinicia o formulário após fechar o alerta
     const handleAlertClose = () => {
         setShowSuccessAlert(false);
-        setForm({ category: '', weightKg: '', description: '', photoTaken: false });
+        setForm({ category: '', weightKg: '', description: '', photoUri: null });
+    };
+
+    // funções para câmera e galeria
+    const handleTakeImage = async () => {
+        const { granted } = await ImagePicker.requestCameraPermissionsAsync();
+        if (!granted) {
+            Alert.alert('Permissão negada', 'O aplicativo precisa de permissão para acessar a câmera.');
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            update('photoUri', result.assets[0].uri);
+        }
+    };
+
+    const handlePickImage = async () => {
+        const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!granted) {
+            Alert.alert('Permissão negada', 'O aplicativo precisa de permissão para acessar a galeria.');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            update('photoUri', result.assets[0].uri);
+        }
+    };
+
+    const handlePhotoOptions = () => {
+        Alert.alert(
+            "Adicionar Foto",
+            "Escolha como deseja adicionar a foto do resíduo",
+            [
+                { text: "Cancelar", style: "cancel" },
+                { text: "Tirar Foto", onPress: handleTakeImage },
+                { text: "Escolher da Galeria", onPress: handlePickImage },
+            ]
+        );
     };
 
     return (
@@ -192,15 +244,16 @@ export default function AnnounceScreen() {
                 <Text style={[styles.label, { color: colors.textMuted }]}>
                     FOTO DO RESÍDUO
                 </Text>
-                {form.photoTaken ? (
-                    <View style={[styles.photoPreview, { backgroundColor: colors.primaryLight }]}>
-                        <Text style={[styles.photoPreviewText, { color: colors.primary }]}>
-                            📸 Foto capturada (simulada)
-                        </Text>
+                {form.photoUri ? (
+                    <View style={styles.photoContainer}>
+                        <Image source={{ uri: form.photoUri }} style={styles.imagePreview} />
+                        <Pressable style={[styles.btnSecondary, { borderColor: colors.border }]} onPress={() => update('photoUri', null)}>
+                            <Text style={[styles.btnSecondaryText, { color: colors.primary }]}>🗑️ Remover Foto</Text>
+                        </Pressable>
                     </View>
                 ) : (
                     <Pressable
-                        onPress={() => update('photoTaken', true)}
+                        onPress={handlePhotoOptions}
                         style={({ pressed }) => [
                             styles.photoPressable,
                             {
@@ -212,7 +265,7 @@ export default function AnnounceScreen() {
                     >
                         <Text style={styles.photoIcon}>📷</Text>
                         <Text style={[styles.photoLabel, { color: colors.primary }]}>
-                            Simular Captura de Foto
+                            Adicionar Foto
                         </Text>
                     </Pressable>
                 )}
@@ -314,13 +367,29 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8,
     },
-    photoPreview: {
-        borderRadius: 12,
-        padding: 20,
-        alignItems: 'center',
+    photoContainer: {
+        gap: 12,
     },
-    photoPreviewText: {
-        fontWeight: '600',
+    imagePreview: {
+        width: '100%',
+        height: 220,
+        borderRadius: 12,
+        backgroundColor: '#eee',
+    },
+    btnSecondary: {
+        backgroundColor: 'transparent',
+        borderRadius: 12,
+        padding: 14,
+        alignItems: 'center',
+        borderWidth: 1.5,
+    },
+    btnSecondaryText: {
+        fontWeight: '700',
+        fontSize: 15,
+    },
+    photoActions: {
+        flexDirection: 'row',
+        gap: 10,
     },
     photoIcon: {
         fontSize: 28,

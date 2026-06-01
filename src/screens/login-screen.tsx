@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/button';
 import Input from '../components/input';
 import { useTheme } from '../context/theme-context';
@@ -25,7 +26,7 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
     const[passwordError, setPasswordError] = useState('');
 
     // função que lida com o login (verificando se os campos estão vazios)
-    const handleLogin = () => {
+    const handleLogin = async () => {
         
         // variável para verificar se os campos são validos
         let isValid = true;
@@ -49,7 +50,12 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
 
         // Se os campos estão preenchidos, faz o login
         if (isValid) {
-            onLogin();
+            try {
+                await AsyncStorage.setItem('@user_logged', 'true');
+                onLogin();
+            } catch (e) {
+                console.error("Erro ao salvar login no AsyncStorage", e);
+            }
         }
 
     };

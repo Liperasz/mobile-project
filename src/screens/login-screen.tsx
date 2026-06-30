@@ -1,38 +1,36 @@
 import React, { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import Button from '../components/button';
 import Input from '../components/input';
 import { useTheme } from '../context/theme-context';
+import { useAuth } from '../context/auth-context';
+import { sqliteService } from '../services/sqlite-service';
+import { AuthStackParamList } from '../navigation/root-navigator';
 
-// propriedades
-type LoginScreenProps = {
-    // o que é executado depois do login
-    onLogin: () => void;
-    // função para ir para a tela de cadastro
-    onNavigateToRegister: () => void;
-};
+type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
-export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScreenProps) {
+// componente
+export default function LoginScreen({ navigation }: Props) {
 
-    // cores dos temas
     const { colors } = useTheme();
-    // variaveis de email e senha
-    const[email, setEmail] = useState('');
-    const[password, setPassword] = useState('');
+    const { login } = useAuth();
 
-    // estados de erros de email e senha
-    const[emailError, setEmailError] = useState('');
-    const[passwordError, setPasswordError] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [generalError, setGeneralError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    // função que lida com o login (verificando se os campos estão vazios)
     const handleLogin = async () => {
-        
-        // variável para verificar se os campos são validos
+
         let isValid = true;
+        setGeneralError('');
 
-
-        // verificando email e senha
         if (!email.trim()) {
             setEmailError('Insira seu e-mail');
             isValid = false;
@@ -47,52 +45,62 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
             setPasswordError('');
         }
 
+        if (!isValid) return;
 
-        // Se os campos estão preenchidos, faz o login
-        if (isValid) {
-            try {
-                await AsyncStorage.setItem('@user_logged', 'true');
-                onLogin();
-            } catch (e) {
-                console.error("Erro ao salvar login no AsyncStorage", e);
+        setIsLoading(true);
+        try {
+            // busca o usuário no banco SQLite local
+            const user = await sqliteService.getUserByEmail(email);
+
+            if (!user) {
+                setGeneralError('Usuário não encontrado. Verifique seu e-mail ou crie uma conta.');
+                return;
             }
-        }
 
+            // faz login salvando a sessão no AuthContext + AsyncStorage
+            await login({
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                type: user.type,
+                address: user.address ?? undefined,
+            });
+
+            // o RootNavigator detecta o usuário e redireciona automaticamente
+
+        } catch (e) {
+            setGeneralError('Erro ao fazer login. Tente novamente.');
+            console.error('[Login]', e);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
-        <View style={[styles.container, {backgroundColor: colors.background}]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
-            {/* header da página*/}
+            {/* header da página */}
             <View style={styles.header}>
-                {/* imagem da logo do projeto */}
                 <Image
                     source={require('../../assets/images/logo.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />
-                {/* título */}
-                <Text style={[styles.title, {color: colors.primaryDark}]}>
+                <Text style={[styles.title, { color: colors.primaryDark }]}>
                     WasteGo
                 </Text>
-                {/* subtítulo */}
-                <Text style={[styles.subtitle, {color: colors.textMuted}]}>
-                    Conectando cidadãos, empresas, governo e cooperativas.
+                <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+                    Conectando cidadãos e cooperativas.
                 </Text>
             </View>
 
-            {/* conteúdo da página */}
+            {/* formulário */}
             <View style={styles.form}>
-                {/* campos de email e senha */}
                 <Input
                     label="E-mail"
                     value={email}
                     errorMessage={emailError}
-                    onChangeText={(text) => {
-                        setEmail(text);
-                        // limpa a mensagem de erro ao digitar
-                        setEmailError('');
-                    }}
+                    onChangeText={(text) => { setEmail(text); setEmailError(''); setGeneralError(''); }}
                     keyboardType="email-address"
                     placeholder="exemplo@email.com"
                 />
@@ -100,29 +108,32 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
                     label="Senha"
                     value={password}
                     errorMessage={passwordError}
-                    onChangeText={(text) => {
-                        setPassword(text);
-                        // limpa a mensagem de erro ao digitar
-                        setPasswordError('');
-                    }}
+                    onChangeText={(text) => { setPassword(text); setPasswordError(''); setGeneralError(''); }}
                     secureTextEntry
                     placeholder="********"
                 />
+
+                {/* mensagem de erro geral */}
+                {generalError ? (
+                    <Text style={styles.errorText}>{generalError}</Text>
+                ) : null}
             </View>
 
-            {/* rodapé / footer */}
+            {/* ações */}
             <View style={styles.cta}>
-                <Button label="Entrar" onPress={handleLogin}></Button>
+                <Button
+                    label={isLoading ? 'Entrando...' : 'Entrar'}
+                    onPress={handleLogin}
+                />
                 <Button
                     label="Criar conta"
-                    onPress={(onNavigateToRegister)}
-                    variant='ghost'
-                    style={{marginTop: 10}}
-                >
-                </Button>
+                    onPress={() => navigation.navigate('Register')}
+                    variant="ghost"
+                    style={{ marginTop: 10 }}
+                />
             </View>
 
-        </View>
+        </SafeAreaView>
     );
 }
 
@@ -130,32 +141,42 @@ export default function LoginScreen( { onLogin, onNavigateToRegister }: LoginScr
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 28
+        padding: 28,
     },
     header: {
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 8
+        marginBottom: 8,
     },
     logo: {
         width: 80,
-        height: 80
+        height: 80,
     },
     title: {
         fontSize: 32,
-        fontWeight: '700', 
-        letterSpacing: -1 
+        fontWeight: '700',
+        letterSpacing: -1,
     },
     subtitle: {
         fontSize: 14,
-        textAlign: 'center'
+        textAlign: 'center',
     },
     form: {
         flex: 1,
-        justifyContent: 'center'
+        justifyContent: 'center',
+    },
+    errorText: {
+        color: '#ef4444',
+        fontSize: 13,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginTop: 8,
+        padding: 12,
+        backgroundColor: '#fef2f2',
+        borderRadius: 8,
     },
     cta: {
-        paddingBottom: 16
+        paddingBottom: 16,
     },
 });

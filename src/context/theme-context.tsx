@@ -1,9 +1,10 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { storageService } from '../services/storage-service';
 
-// definindo os esquemas de cores
+// Definindo os esquemas de cores
 export type ColorScheme = 'light' | 'dark';
 
-// definindo os tipos de cores
+// Definindo os tipos de cores
 export type ThemeColors = {
     background: string;
     surface: string;
@@ -15,14 +16,14 @@ export type ThemeColors = {
     border: string;
 };
 
-// estrutura que o contexto vai entregar
+// Estrutura que o contexto vai entregar
 interface ThemeContextType {
     scheme: ColorScheme;
     colors: ThemeColors;
     toggleTheme: () => void;
 }
 
-// cores utilizadas em cada tema
+// Cores utilizadas em cada tema
 const LIGHT_COLORS: ThemeColors = {
     background:   '#f8faf8',
     surface:      '#ffffff',
@@ -45,24 +46,35 @@ const DARK_COLORS: ThemeColors = {
     border:       '#14532d',
 };
 
-// criando contexto
+// Criando contexto
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// provider
+// Provider
 export function ThemeProvider({ children }: { children: ReactNode }) {
 
-    // define o esquema de cores, tendo o light como padrão
+    // Define o esquema de cores, tendo o light como padrão
     const [scheme, setScheme] = useState<ColorScheme>('light');
 
-    // função que troca o tema
+    // Carrega a preferência de tema salva no AsyncStorage
+    useEffect(() => {
+        storageService.getTheme().then((savedTheme) => {
+            if (savedTheme) setScheme(savedTheme);
+        });
+    }, []);
+
+    // Função que troca o tema e persiste a preferência
     const toggleTheme = () => {
-        setScheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+        setScheme((prev) => {
+            const next: ColorScheme = prev === 'light' ? 'dark' : 'light';
+            storageService.saveTheme(next); // persiste no AsyncStorage
+            return next;
+        });
     };
 
-    // seleciona as cores
+    // Seleciona as cores
     const colors = scheme === 'light' ? LIGHT_COLORS : DARK_COLORS;
 
-    // valores enviados
+    // Valores enviados
     const value: ThemeContextType = {
         scheme,
         colors,
@@ -74,7 +86,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     );
 }
 
-// verificação de erro
+// Verificação de erro
 export const useTheme = (): ThemeContextType => {
     const context = useContext(ThemeContext);
 

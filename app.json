@@ -12,17 +12,38 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "O WasteGo usa sua localização para registrar o local dos resíduos anunciados e mostrar ecopontos próximos.",
+        "NSCameraUsageDescription": "O WasteGo usa a câmera para fotografar os resíduos que você quer anunciar.",
+        "NSPhotoLibraryUsageDescription": "O WasteGo acessa sua galeria para que você possa selecionar fotos dos resíduos."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-sqlite",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "O WasteGo usa sua localização para registrar o local dos resíduos e mostrar ecopontos próximos."
+        }
+      ]
+    ]
   }
 }
